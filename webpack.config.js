@@ -26,6 +26,16 @@ module.exports = {
         rules: [
             {test: /\.scss$/, use: ['style-loader', 'css-loader', 'sass-loader']},
             {test: /\.(png|jpg|jpeg|svg)$/, type: 'asset/resource'},
+            {
+                test: /\.m?js$/,
+                exclude: /(node_modules|bower_components)/,
+                use: {
+                    loader: 'babel-loader',
+                    options: {
+                    presets: ['@babel/preset-env']
+                    }
+                }
+            }
         ],
     }
 }
