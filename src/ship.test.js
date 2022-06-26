@@ -8,11 +8,14 @@ describe('Ship factory.', () => {
         expect(ship('destroyer').length).toBe(2)
     })
 
+    test('Get ship type', () => {
+        expect(ship(5).getType()).toBe('carrier')
+    })
+
     test('Register a hit on the ship.', () => {
         const newShip = ship('destroyer')
         newShip.hit(0)
-        console.log(newShip.getSegments())
-        expect(newShip.getSegments()).toEqual(['hit', 'safe'])
+        expect(newShip.segments).toEqual(['hit', 'safe'])
     })
 
     test('Communicate how many times it has been hit.', () => {
@@ -35,23 +38,42 @@ describe('Ship factory.', () => {
 
 describe('Gameboard inputs.', () => {
 
-    test('Create a nested array based on number of grids required.', () => {
-        const cellCount = 5
-        const expected = Array(cellCount).fill(Array(cellCount).fill('x'))
-        expect(gameBoard(cellCount).gameGrid).toEqual(expected)
+    test('Create a nested array representing the gameboard grids based on an input number.', () => {
+        const gridCount = 5
+        const expected = Array.from(Array(gridCount), () => new Array(gridCount).fill(' '))
+        expect(gameBoard(gridCount).grid).toEqual(expected)
     })
 
-    test('Assign ship position based on coordinates.', () => {
-        const x = 0
-        const y = 0
-        const ship = 'carrier'
-
-        const newBoard = gameBoard()
-        newBoard.assignShipPosition(ship, x, y)
-        expect(newBoard.shipPositions()).toEqual([{ship: 'carrier', xPos: x, yPos: y}])
+    test('Initialise a ship object and store within a gameboard.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        const newCarrier = ship('carrier')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'horizontal')
+        newBoard.assignShipPosition(newCarrier, 1, 1, 'vertical')
+        const expected = [
+            [{ xPos: 0, yPos: 0 }, { xPos: 1, yPos: 0 }],
+            [{xPos: 1, yPos: 1}, {xPos: 1, yPos: 2}, {xPos: 1, yPos: 3}, {xPos: 1, yPos: 4}, {xPos: 1, yPos: 5}]
+        ]
+        expect(newBoard.positions[0].ship.segments).toEqual(expect.arrayContaining(expected[0]))
+        expect(newBoard.positions[1].ship.segments).toEqual(expect.arrayContaining(expected[1]))
     })
 
-    test.todo('Place ships at a specified location by calling ship factory function.')
+    test('Mark gameboard with ship segments.', () => {
+        const newShip = ship('carrier')
+        const newBoard = gameBoard(10)
+        newBoard.assignShipPosition(newShip, 0, 0, 'horizontal')
+        const expected = ['carrier', 'carrier', 'carrier', 'carrier', 'carrier', ' ', ' ', ' ', ' ', ' ']
+        expect(newBoard.grid[0]).toEqual(expected)
+    })
+
+    test('Negate ship placement if segments with an already existing ship location.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        const newCarrier = ship('carrier')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'horizontal')
+        expect(() => { newBoard.assignShipPosition(newCarrier, 0, 0, 'vertical') }).toThrow()
+    })
+        
     test.todo('Receive attack function and determines if ship is hit and finally sends calls hit function on ship.')
     test.todo('Keep track of missed attacks so that they can used for display.')
     test.todo('Report whether all ships have been sunken.')
