@@ -3,13 +3,12 @@ const {ship, gameBoard} = require('./ship')
 describe('Ship factory.', () => {
 
     test('Obtain the length of a given ship.', () => {
-        expect(ship(5).length).toBe(5)
         expect(ship('carrier').length).toBe(5)
         expect(ship('destroyer').length).toBe(2)
     })
 
     test('Get ship type', () => {
-        expect(ship(5).getType()).toBe('carrier')
+        expect(ship('carrier').getType()).toBe('carrier')
     })
 
     test('Register a hit on the ship.', () => {
@@ -54,8 +53,8 @@ describe('Gameboard inputs.', () => {
             [{ xPos: 0, yPos: 0 }, { xPos: 1, yPos: 0 }],
             [{xPos: 1, yPos: 1}, {xPos: 1, yPos: 2}, {xPos: 1, yPos: 3}, {xPos: 1, yPos: 4}, {xPos: 1, yPos: 5}]
         ]
-        expect(newBoard.positions[0].ship.segments).toEqual(expect.arrayContaining(expected[0]))
-        expect(newBoard.positions[1].ship.segments).toEqual(expect.arrayContaining(expected[1]))
+        expect(newBoard.shipsData[0].ship.segments).toEqual(expect.arrayContaining(expected[0]))
+        expect(newBoard.shipsData[1].ship.segments).toEqual(expect.arrayContaining(expected[1]))
     })
 
     test('Mark gameboard with ship segments.', () => {
