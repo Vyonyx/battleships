@@ -74,8 +74,54 @@ describe('Gameboard inputs.', () => {
         expect(() => { newBoard.assignShipPosition(newCarrier, 0, 0, 'vertical') }).toThrow()
     })
         
-    test.todo('Receive attack function and determines if ship is hit and finally sends calls hit function on ship.')
-    test.todo('Keep track of missed attacks so that they can used for display.')
-    test.todo('Report whether all ships have been sunken.')
+    test('Receive attack function and determines if ship is hit and finally sends calls hit function on ship.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        const newCarrier = ship('carrier')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'vertical')
+        newBoard.assignShipPosition(newCarrier, 1, 0, 'vertical')
+        newBoard.attack(0, 0)
+        newBoard.attack(0, 1)
+        expect(newDestroyer.hitsTaken()).toBe(2)
+        newBoard.attack(1, 0)
+        newBoard.attack(1, 1)
+        expect(newCarrier.hitsTaken()).toBe(2)
+    })
+
+    test('Cannot declare attack on same square more than once.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'vertical')
+        newBoard.attack(0, 0)
+        expect(() => { newBoard.attack(0, 0) }).toThrow()
+    })
+    test('Keep track of missed attacks so that they can used for display.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'vertical')
+        newBoard.attack(0, 0)
+        newBoard.attack(0, 1)
+        newBoard.attack(1, 1)
+        expect(newBoard.attackedPositions.length).toBe(3)
+        console.table(newBoard.grid)
+
+    })
+    test('Report whether all ships have been sunken.', () => {
+        const newBoard = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        newBoard.assignShipPosition(newDestroyer, 0, 0, 'vertical')
+        newBoard.attack(0, 0)
+        newBoard.attack(0, 1)
+
+        const newCarrier = ship('carrier')
+        newBoard.assignShipPosition(newCarrier, 1, 0, 'horizontal')
+        newBoard.attack(1, 0)
+        newBoard.attack(2, 0)
+        newBoard.attack(3, 0)
+        newBoard.attack(4, 0)
+        newBoard.attack(5, 0)
+
+        expect(newBoard.shipsSunken()).toBe(true)
+    })
 
 })

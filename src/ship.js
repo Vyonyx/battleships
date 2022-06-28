@@ -8,6 +8,7 @@ function ship(lengthID) {
     }
     const length = typeof lengthID == 'number' ? lengthID : shipTypes[lengthID]
     let segments = Array(length).fill('safe')
+    let hitsTaken = 0
 
 
     return {
@@ -25,6 +26,7 @@ function ship(lengthID) {
 function gameBoard(gridCells = 3) {
     let positions = []
     let placedShipPositions = []
+    attackedPositions = []
     let grid = Array.from(Array(gridCells), () => new Array(gridCells).fill(' '))
     
     function placeShips(shipObj) {
@@ -54,11 +56,42 @@ function gameBoard(gridCells = 3) {
         })
     }
 
+    function attack(x, y) {
+        const wasPrevAttack = attackedPositions.some(({xPos, yPos}) => { return xPos == x && yPos == y })
+        attackedPositions.push({xPos: x, yPos: y})
+        if (wasPrevAttack) {
+            throw Error('Was a previous attack.')
+        }
+        if (grid[y][x] != ' ') {
+            let hitIndex = null
+            const hitShip = positions.find(pos => {
+                return pos.ship.segments.find((coord, index) => {
+                    const {xPos, yPos} = coord
+                    if(xPos == x && yPos == y) {
+                        hitIndex = index
+                        return true
+                    }
+                })
+            }).ship
+
+            hitShip.hit(hitIndex)
+        } else {
+            grid[y][x] = 'miss'
+        }
+    }
+
+    function shipsSunken() {
+        return positions.every(pos => {
+            return pos.ship.isSunken()
+        })
+    }
+
 
     return {
         grid,
         positions,
         shipPositions: placedShipPositions,
+        attackedPositions,
         assignShipPosition: function (shipObj, x, y, direction = 'horizontal') {
             shipObj.segments = shipObj.segments.map((element, index) => {
                 const segmentX = direction == 'horizontal' ? x + index : x
@@ -74,6 +107,8 @@ function gameBoard(gridCells = 3) {
                 yPos: y,
             })
         },
+        attack,
+        shipsSunken
     }
 }
 
