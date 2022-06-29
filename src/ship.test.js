@@ -1,4 +1,7 @@
-const {ship, gameBoard} = require('./ship')
+const {ship, gameBoard, player} = require('./ship')
+
+const randCoordMock = jest.fn()
+const gridMock = jest.fn()
 
 describe('Ship factory.', () => {
 
@@ -102,7 +105,6 @@ describe('Gameboard inputs.', () => {
         newBoard.attack(0, 1)
         newBoard.attack(1, 1)
         expect(newBoard.attackedPositions.length).toBe(3)
-        console.table(newBoard.grid)
 
     })
     test('Report whether all ships have been sunken.', () => {
@@ -123,4 +125,45 @@ describe('Gameboard inputs.', () => {
         expect(newBoard.shipsSunken()).toBe(true)
     })
 
+})
+
+
+
+describe('Player tests (inc. AI).', () => {
+
+    test('Allow AI player to get available moves for random selection.', () => {
+        const myBoard = gameBoard(10)
+        const enemy = gameBoard(10)
+        const aiPlayer = player(myBoard, enemy)
+        aiPlayer.randomAttack( {x: 0, y: 0} )
+        aiPlayer.randomAttack( {x: 1, y: 0} )
+
+        expect(aiPlayer.enemy.availableMoves()).toEqual(expect.not.arrayContaining( [{x: 0, y: 0}] ))
+    })
+
+    test('Use random move to declare AI attack.', () => {
+        const myBoard = gameBoard(10)
+        const enemy = gameBoard(10)
+        const aiPlayer = player(myBoard, enemy)
+        aiPlayer.randomAttack()
+        expect(aiPlayer.enemy.attackedPositions.length).toBe(1)
+    })
+
+    test('Confirm all ships have sunken.', () => {
+        const myBoard = gameBoard(10)
+        const enemy = gameBoard(10)
+        const newDestroyer = ship('destroyer')
+        const aiPlayer = player(myBoard, enemy)
+
+        enemy.assignShipPosition(newDestroyer, 0, 0, 'vertical')
+
+        randCoordMock.mockReturnValueOnce( {x: 0, y: 0} )
+        randCoordMock.mockReturnValueOnce( {x: 0, y: 1} )
+        
+        aiPlayer.attack(randCoordMock())
+        aiPlayer.attack(randCoordMock())
+
+        expect(aiPlayer.enemy.shipsSunken()).toBe(true)
+
+    })
 })

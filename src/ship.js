@@ -28,7 +28,7 @@ function gameBoard(gridCells = 3) {
 
     let grid = Array.from(Array(gridCells), () => new Array(gridCells).fill(' '))
     
-    
+
     function placeShip(shipObj) {
         const shipSegmentPositions = shipObj.segments
             .map(coords => {
@@ -89,6 +89,19 @@ function gameBoard(gridCells = 3) {
         return shipsData.every( ({ship}) => ship.isSunken() )
     }
 
+    function availableMoves() {
+        const moves = []
+        grid.forEach((row, yIndex) => {
+            row.forEach((element, xIndex) => {
+                if (element == ' ') {
+                    const coord = {x:xIndex, y: yIndex}
+                    moves.push(coord)
+                }
+            })
+        })
+        return moves
+    }
+
 
     return {
         grid,
@@ -96,8 +109,47 @@ function gameBoard(gridCells = 3) {
         attackedPositions,
         assignShipPosition,
         attack,
-        shipsSunken
+        shipsSunken,
+        availableMoves
     }
 }
 
-module.exports = { ship, gameBoard }
+
+function player(pB, eB) {
+    const myBoard = pB
+    const enemy = eB
+
+
+    function attack(coords) {
+        let {x, y} = coords
+        enemy.attack(x, y)
+    }
+
+
+    function randomAttack(inputCoords = null) {
+        let attackedPositions = enemy.attackedPositions
+        if (attackedPositions.length >= 99) return
+        
+        if (inputCoords != null) {
+            let {x, y} = inputCoords
+            enemy.attack(x, y)
+            return
+        } else {
+            const movesList = enemy.availableMoves()
+            const randIndex = Math.floor(Math.random() * movesList.length)
+            const randMove = movesList[randIndex]
+            attack(randMove)
+            return
+        }
+    }
+
+
+    return {
+        myBoard,
+        enemy,
+        attack,
+        randomAttack
+    }
+}
+
+module.exports = { ship, gameBoard, player }
