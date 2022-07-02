@@ -1,0 +1,38 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+.grid-container {
+    width: fit-content;
+    border: 2px solid #666;
+
+    .grid-row {
+        display: flex;
+        align-items: center;
+    
+        .gridCell {
+            $size: 70px;
+            width: $size;
+            height: $size;
+            border: 0.5px solid #666;
+        }
+    }
+}
+
+// .grid-container.small {
+//     transform-origin: top left;
+//     transform: scale(50%);
+// }
+
+
+.dot {
+    $size: 10px;
+    background: black;
+    width: $size;
+    height: $size;
+    border-radius: 50%;
+    position:absolute;
+    transform: translate(-50%, -50%);
+}

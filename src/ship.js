@@ -27,6 +27,7 @@ function gameBoard(gridCells = 3) {
     let attackedPositions = []
 
     let grid = Array.from(Array(gridCells), () => new Array(gridCells).fill(' '))
+    const length = grid.length
     
 
     function placeShip(shipObj) {
@@ -105,6 +106,7 @@ function gameBoard(gridCells = 3) {
 
     return {
         grid,
+        length,
         shipsData,
         attackedPositions,
         assignShipPosition,
