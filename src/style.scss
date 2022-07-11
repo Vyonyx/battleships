@@ -6,7 +6,7 @@
 
 .grid-container {
     width: fit-content;
-    border: 2px solid #666;
+    // border: 2px solid #666;
 
     .grid-row {
         display: flex;
@@ -19,20 +19,4 @@
             border: 0.5px solid #666;
         }
     }
-}
-
-// .grid-container.small {
-//     transform-origin: top left;
-//     transform: scale(50%);
-// }
-
-
-.dot {
-    $size: 10px;
-    background: black;
-    width: $size;
-    height: $size;
-    border-radius: 50%;
-    position:absolute;
-    transform: translate(-50%, -50%);
 }
