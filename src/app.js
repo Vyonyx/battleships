@@ -10,6 +10,16 @@ const shipAssets = {
     destroyer: { default: {horizontal: require('./assets/destroyer_horizontal.svg'), vertical: require('./assets/destroyer_vertical.svg')}, segments: 2, },
 }
 
+const moveDiagram = new Image(90)
+moveDiagram.src = require('./assets/move-diagram.svg')
+const rotateDiagram = new Image(140)
+rotateDiagram.src = require('./assets/rotate-diagram.svg')
+
+document.querySelector('.instruction-move').appendChild(moveDiagram)
+document.querySelector('.instruction-rotate').appendChild(rotateDiagram)
+
+// const moveDiagram = require('./assets')
+
 // TODO: Auto initalise a game that has already begun with pre-determined ship positions.
     // TODO: Set this up in a function so that AI can auto populate positions randomly each game.
     // TODO: Auto populate player ship positions.
@@ -178,6 +188,12 @@ function fitShipIntoGrid(ship) {
 
 function rotateShip() {
     const remainingShips = document.querySelector('.ship-container').children
+    const shipContainer = document.querySelector('.ship-container')
+    const orientation = Array.from(remainingShips)[0].getAttribute('data-ship-orientation')
+
+    shipContainer.style['grid-template-columns'] = orientation == 'horizontal' ?
+        'repeat(3, auto)' : 'repeat(1, auto)'
+    // shipContainer.style['grid-template-columns'] = 'repeat(5, auto)'
     Array.from(remainingShips).forEach(ship => {
         if(!ship.onmousedown) return
         const data = ship.getBoundingClientRect()
@@ -214,7 +230,9 @@ function assignShipsToGameboard() {
     const allShips = document.querySelectorAll('.ship')
     allShips.forEach(currentShip => {
         const shipCoords = currentShip.getBoundingClientRect()
+        const shipOrientation = currentShip.getAttribute('data-ship-orientation')
         let gridXPos, gridYPos
+
         Array.from(gameGrid.children).forEach(row => {
             [...row.children].forEach(cell => {
                 const cellCoords = cell.getBoundingClientRect()
@@ -225,8 +243,9 @@ function assignShipsToGameboard() {
                 }
             })
         })
+
         const newShip = ship(currentShip.getAttribute('data-ship-type'))
-        newBoard.assignShipPosition(newShip, gridXPos, gridYPos)
+        newBoard.assignShipPosition(newShip, gridXPos, gridYPos, shipOrientation)
     })
     console.table(newBoard.grid)
 }
