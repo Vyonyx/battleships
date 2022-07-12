@@ -44,6 +44,9 @@
         .ship-container {
             grid-area: ships;
             place-self: center;
+            display: grid;
+            grid-template-columns: repeat(2, auto);
+            gap: 20px;
         }
         .start {
             @include nextButton();

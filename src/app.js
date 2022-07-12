@@ -27,8 +27,11 @@ const rotateBtn = document.querySelector('.rotate')
 const startBtn = document.querySelector('.start')
 
 // Create draggable ships.
-const ship1 = createShip('destroyer')
-const ship2 = createShip('carrier')
+const ship1 = createShip('carrier')
+const ship2 = createShip('battleship')
+const ship3 = createShip('cruiser')
+const ship4 = createShip('destroyer')
+const ship5 = createShip('destroyer')
 
 rotateBtn.addEventListener('click', rotateShip)
 startBtn.addEventListener('click', startGame)
@@ -61,7 +64,7 @@ function createShip(type='destroyer') {
     newShip.classList.add('ship')
     newShip.setAttribute('data-ship-type', type)
     newShip.setAttribute('data-ship-orientation', 'horizontal')
-    newShip.style.position = 'absolute'
+    // newShip.style.position = 'absolute'
 
     makeDraggable(newShip)
     return newShip
@@ -75,7 +78,6 @@ function makeDraggable(ship) {
         let shiftY = e.clientY - ship.getBoundingClientRect().top
 
         ship.style.position = 'absolute'
-        // ship.style.zIndex = 1000;
 
         function moveAt(pageX, pageY) {
             ship.style.top = pageY - shiftY + 'px'
@@ -95,6 +97,7 @@ function makeDraggable(ship) {
             ship.onmouseup = null
             snapToGrid(ship)
             ship.style.zIndex = 1
+            ship.onmousedown = null
         }
     }
 
@@ -174,18 +177,22 @@ function fitShipIntoGrid(ship) {
 }
 
 function rotateShip() {
-    const ship = document.querySelector('.active')
-    const data = ship.getBoundingClientRect()
-    let shipHeight = data.width + 'px'
-    let shipWidth = data.height + 'px'
-    ship.style.height = shipHeight
-    ship.style.width = shipWidth
-    const type = ship.getAttribute('data-ship-type')
-    const currentOrientation = ship.getAttribute('data-ship-orientation')
-    const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
-    ship.src =  shipAssets[type].default[newOrientation]
-    ship.setAttribute('data-ship-orientation', newOrientation)
-    fitShipIntoGrid(ship)
+    const remainingShips = document.querySelector('.ship-container').children
+    Array.from(remainingShips).forEach(ship => {
+        if(!ship.onmousedown) return
+        const data = ship.getBoundingClientRect()
+        let shipHeight = data.width + 'px'
+        let shipWidth = data.height + 'px'
+        ship.style.height = shipHeight
+        ship.style.width = shipWidth
+        const type = ship.getAttribute('data-ship-type')
+        const currentOrientation = ship.getAttribute('data-ship-orientation')
+        const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
+        ship.src =  shipAssets[type].default[newOrientation]
+        ship.setAttribute('data-ship-orientation', newOrientation)
+        fitShipIntoGrid(ship)
+    })
+
 }
 
 function createShipImage(id, container) {
@@ -195,7 +202,6 @@ function createShipImage(id, container) {
     newShip.src = shipAssets[id].default.horizontal
     newShip.draggable = true
     newShip.classList.add('draggable')
-    newShip.style.position = 'absolute'
     container.appendChild(newShip)
     return newShip
 }
