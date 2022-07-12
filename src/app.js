@@ -1,13 +1,13 @@
 const {ship, gameBoard, player} = require('./ship')
 require('./style.scss')
 
-const CELL_HEIGHT = 70
+const CELL_HEIGHT = 50
 
 const shipAssets = {
-    carrier: { default: require('./assets/carrier.svg'), segments: 5, },
-    battleship: { default: require('./assets/battleship.svg'), segments: 4, },
-    cruiser: { default: require('./assets/cruiser.svg'), segments: 3, },
-    destroyer: { default: require('./assets/destroyer.svg'), segments: 2, },
+    carrier: { default: {horizontal: require('./assets/carrier_horizontal.svg'), vertical: require('./assets/carrier_vertical.svg')}, segments: 5, },
+    battleship: { default: {horizontal: require('./assets/battleship_horizontal.svg'), vertical: require('./assets/battleship_vertical.svg')}, segments: 4, },
+    cruiser: { default: {horizontal: require('./assets/cruiser_horizontal.svg'), vertical: require('./assets/cruiser_vertical.svg')}, segments: 3, },
+    destroyer: { default: {horizontal: require('./assets/destroyer_horizontal.svg'), vertical: require('./assets/destroyer_vertical.svg')}, segments: 2, },
 }
 
 // TODO: Auto initalise a game that has already begun with pre-determined ship positions.
@@ -16,8 +16,8 @@ const shipAssets = {
 
 const newBoard = gameBoard(10)
 const gameGrid = document.querySelector('.grid')
-gameGrid.classList.add('grid-container')
-document.body.appendChild(gameGrid)
+const shipStartingContainer = document.querySelector('.ship-container')
+
 initaliseBoard(gameGrid)
 
 // Visual grid parameters.
@@ -27,11 +27,11 @@ const rotateBtn = document.querySelector('.rotate')
 const startBtn = document.querySelector('.start')
 
 // Create draggable ships.
-const ship1 = createShip('ship')
-const ship2 = createShip('ship')
+const ship1 = createShip('destroyer')
+const ship2 = createShip('carrier')
 
-// rotateBtn.addEventListener('click', rotateShip)
-// startBtn.addEventListener('click', startGame)
+rotateBtn.addEventListener('click', rotateShip)
+startBtn.addEventListener('click', startGame)
 
 function initaliseBoard(board) {
     const positions = Array.from((Array(newBoard.length)), (col, yIndex) => {
@@ -47,26 +47,23 @@ function initaliseBoard(board) {
             const newDiv = document.createElement('div')
             newDiv.dataset.coord = coord
             newDiv.classList.add('gridCell')
+            newDiv.style.width = CELL_HEIGHT + 'px'
+            newDiv.style.height = CELL_HEIGHT + 'px'
             newDiv.draggable = true
             newRow.appendChild(newDiv)
         })
         board.appendChild(newRow)
     })
-
-    document.body.appendChild(board)
 }
 
-function createShip(type='ship') {
-    const newShip = createShipImage('carrier', document.body)
-    newShip.classList.add(type)
+function createShip(type='destroyer') {
+    const newShip = createShipImage(type, shipStartingContainer)
+    newShip.classList.add('ship')
+    newShip.setAttribute('data-ship-type', type)
+    newShip.setAttribute('data-ship-orientation', 'horizontal')
     newShip.style.position = 'absolute'
-    document.body.appendChild(newShip)
 
     makeDraggable(newShip)
-    newShip.ondblclick = function() {
-        ship.style.background = 'black'
-    }
-
     return newShip
 }
 
@@ -78,7 +75,7 @@ function makeDraggable(ship) {
         let shiftY = e.clientY - ship.getBoundingClientRect().top
 
         ship.style.position = 'absolute'
-        ship.style.zIndex = 1000;
+        // ship.style.zIndex = 1000;
 
         function moveAt(pageX, pageY) {
             ship.style.top = pageY - shiftY + 'px'
@@ -97,6 +94,7 @@ function makeDraggable(ship) {
             document.removeEventListener('mousemove', onMouseMove)
             ship.onmouseup = null
             snapToGrid(ship)
+            ship.style.zIndex = 1
         }
     }
 
@@ -182,17 +180,47 @@ function rotateShip() {
     let shipWidth = data.height + 'px'
     ship.style.height = shipHeight
     ship.style.width = shipWidth
+    const type = ship.getAttribute('data-ship-type')
+    const currentOrientation = ship.getAttribute('data-ship-orientation')
+    const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
+    ship.src =  shipAssets[type].default[newOrientation]
+    ship.setAttribute('data-ship-orientation', newOrientation)
     fitShipIntoGrid(ship)
 }
 
 function createShipImage(id, container) {
-    const height = 70
+    const height = CELL_HEIGHT
     const width = shipAssets[id].segments * height
     const newShip = new Image(width, height)
-    newShip.src = shipAssets[id].default
+    newShip.src = shipAssets[id].default.horizontal
     newShip.draggable = true
     newShip.classList.add('draggable')
     newShip.style.position = 'absolute'
     container.appendChild(newShip)
     return newShip
+}
+
+function startGame() {
+    assignShipsToGameboard()
+}
+
+function assignShipsToGameboard() {
+    const allShips = document.querySelectorAll('.ship')
+    allShips.forEach(currentShip => {
+        const shipCoords = currentShip.getBoundingClientRect()
+        let gridXPos, gridYPos
+        Array.from(gameGrid.children).forEach(row => {
+            [...row.children].forEach(cell => {
+                const cellCoords = cell.getBoundingClientRect()
+                if(shipCoords.x == cellCoords.x && shipCoords.y == cellCoords.y) {
+                    const cellData = cell.getAttribute('data-coord').split(' ')
+                    gridXPos = parseInt(cellData[0])
+                    gridYPos = parseInt(cellData[1])
+                }
+            })
+        })
+        const newShip = ship(currentShip.getAttribute('data-ship-type'))
+        newBoard.assignShipPosition(newShip, gridXPos, gridYPos)
+    })
+    console.table(newBoard.grid)
 }

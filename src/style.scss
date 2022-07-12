@@ -1,12 +1,69 @@
+@mixin nextButton() {
+    position: fixed;
+    right: 50px;
+    bottom: 50px;
+    width: 180px;
+    height: 80px;
+    padding: 1em;
+
+    font-size: 2em;
+    border: 3px solid #666;
+    color: #666;
+    background: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+        background: #666;
+        color: white;
+    }
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-.grid-container {
-    width: fit-content;
-    // border: 2px solid #666;
+// Positioning.
+.game-setup {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    grid:
+        'game-grid ... ships' 1fr /
+        1fr 100px 1fr;
+    
+        .grid {
+            grid-area: game-grid;
+            place-self: center;
+        }
+
+        .ship-container {
+            grid-area: ships;
+            place-self: center;
+        }
+        .start {
+            @include nextButton();
+        }
+
+        .rotate {
+            @include nextButton();
+            right: calc(50px + 180px + 30px);
+        }
+}
+
+.grid {
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border: 3px solid black;
+    }
 
     .grid-row {
         display: flex;
