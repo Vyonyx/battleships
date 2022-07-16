@@ -134,6 +134,8 @@ function gameBoard(gridCells = 9) {
             }
         })
 
+        console.log(grid)
+
         function randomOrientation() { return Math.random() < 0.5 ? 'horizontal' : 'vertical' }
 
         function randomX(orientation, length) {
