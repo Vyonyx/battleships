@@ -1,4 +1,4 @@
-const {ship, gameBoard, player} = require('./ship')
+const {ship, gameBoard, player} = require('./model')
 
 const randCoordMock = jest.fn()
 const gridMock = jest.fn()
@@ -6,12 +6,12 @@ const gridMock = jest.fn()
 describe('Ship factory.', () => {
 
     test('Obtain the length of a given ship.', () => {
-        expect(ship('carrier').length).toBe(5)
-        expect(ship('destroyer').length).toBe(2)
+        expect(ship('carrier').shipLength).toBe(5)
+        expect(ship('destroyer').shipLength).toBe(2)
     })
 
     test('Get ship type', () => {
-        expect(ship('carrier').getType()).toBe('carrier')
+        expect(ship('carrier').getType).toBe('carrier')
     })
 
     test('Register a hit on the ship.', () => {
@@ -74,6 +74,12 @@ describe('Gameboard inputs.', () => {
         const newCarrier = ship('carrier')
         newBoard.assignShipPosition(newDestroyer, 0, 0, 'horizontal')
         expect(() => { newBoard.assignShipPosition(newCarrier, 0, 0, 'vertical') }).toThrow()
+    })
+
+    test('Random initialisation of 4 ships on game board.', () => {
+        const newBoard = gameBoard()
+        newBoard.randomBoardInitialisation()
+        expect(newBoard.shipsData.length).toBe(4)
     })
         
     test('Receive attack function and determines if ship is hit and finally sends calls hit function on ship.', () => {

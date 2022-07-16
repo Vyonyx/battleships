@@ -1,4 +1,4 @@
-const {ship, gameBoard, player} = require('./ship')
+const {ship, gameBoard, player} = require('./model')
 require('./style.scss')
 
 const CELL_HEIGHT = 50
@@ -18,8 +18,6 @@ rotateDiagram.src = require('./assets/rotate-diagram.svg')
 document.querySelector('.instruction-move').appendChild(moveDiagram)
 document.querySelector('.instruction-rotate').appendChild(rotateDiagram)
 
-// const moveDiagram = require('./assets')
-
 // TODO: Auto initalise a game that has already begun with pre-determined ship positions.
     // TODO: Set this up in a function so that AI can auto populate positions randomly each game.
     // TODO: Auto populate player ship positions.
@@ -37,13 +35,25 @@ const rotateBtn = document.querySelector('.rotate')
 const startBtn = document.querySelector('.start')
 
 // Create draggable ships.
-const ship1 = createShip('carrier')
-const ship2 = createShip('battleship')
-const ship3 = createShip('cruiser')
-const ship4 = createShip('destroyer')
-const ship5 = createShip('destroyer')
+// const ship1 = createShip('carrier')
+// const ship2 = createShip('battleship')
+// const ship3 = createShip('cruiser')
+// const ship4 = createShip('destroyer')
 
-rotateBtn.addEventListener('click', rotateShip)
+createShipsFromInitialisation()
+
+function createShipsFromInitialisation() {
+
+    newBoard.randomBoardInitialisation()
+    const data = newBoard.shipsData
+    data.forEach(item => {
+        const newShip = createShip(item.ship.getType)
+        if (item.direction == 'vertical') rotateShip(newShip)
+    })
+
+}
+
+rotateBtn.addEventListener('click', rotateShipsContainer)
 startBtn.addEventListener('click', startGame)
 
 function initaliseBoard(board) {
@@ -186,29 +196,32 @@ function fitShipIntoGrid(ship) {
     ship.style.top = shipY + 'px'
 }
 
-function rotateShip() {
+function rotateShipsContainer() {
     const remainingShips = document.querySelector('.ship-container').children
     const shipContainer = document.querySelector('.ship-container')
     const orientation = Array.from(remainingShips)[0].getAttribute('data-ship-orientation')
 
     shipContainer.style['grid-template-columns'] = orientation == 'horizontal' ?
         'repeat(3, auto)' : 'repeat(1, auto)'
-    // shipContainer.style['grid-template-columns'] = 'repeat(5, auto)'
+
     Array.from(remainingShips).forEach(ship => {
         if(!ship.onmousedown) return
-        const data = ship.getBoundingClientRect()
-        let shipHeight = data.width + 'px'
-        let shipWidth = data.height + 'px'
-        ship.style.height = shipHeight
-        ship.style.width = shipWidth
-        const type = ship.getAttribute('data-ship-type')
-        const currentOrientation = ship.getAttribute('data-ship-orientation')
-        const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
-        ship.src =  shipAssets[type].default[newOrientation]
-        ship.setAttribute('data-ship-orientation', newOrientation)
+        rotateShip(ship)
         fitShipIntoGrid(ship)
-    })
+    })    
+}
 
+function rotateShip(ship) {
+    const data = ship.getBoundingClientRect()
+    let shipHeight = data.width + 'px'
+    let shipWidth = data.height + 'px'
+    ship.style.height = shipHeight
+    ship.style.width = shipWidth
+    const type = ship.getAttribute('data-ship-type')
+    const currentOrientation = ship.getAttribute('data-ship-orientation')
+    const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
+    ship.src =  shipAssets[type].default[newOrientation]
+    ship.setAttribute('data-ship-orientation', newOrientation)
 }
 
 function createShipImage(id, container) {
