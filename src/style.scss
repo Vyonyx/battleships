@@ -82,13 +82,8 @@
 
 .grid {
     position: relative;
-
-    &::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        border: 3px solid black;
-    }
+    border: 5px solid black;
+    width: fit-content;
 
     .grid-row {
         display: flex;

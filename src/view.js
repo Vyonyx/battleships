@@ -1,5 +1,7 @@
 function viewer() {
     const CELL_HEIGHT = 50
+    const setupScreen = document.querySelector('.game-setup')
+    const gameScreen = document.querySelector('.game-screen')
     
     // ---------- Image URL's for dynamic creation of images. ---------- \\
     const shipAssets = {
@@ -17,7 +19,7 @@ function viewer() {
     document.querySelector('.instruction-move').appendChild(moveDiagram)
     document.querySelector('.instruction-rotate').appendChild(rotateDiagram)
     
-    const gameGrid = document.querySelector('.grid')
+    const playerGrid = document.querySelector('.grid')
     const shipStartingContainer = document.querySelector('.ship-container')
     
     // ---------- Parameters for the displayed grid. ---------- \\
@@ -28,7 +30,7 @@ function viewer() {
     const startBtn = document.querySelector('.start')
     
     // ---------- Game setup. ---------- \\
-    initaliseBoard(gameGrid)
+    initaliseBoard(playerGrid)
     
     function initaliseBoard(board) {
         const positions = Array.from((Array(matrixSize)), (col, yIndex) => {
@@ -121,7 +123,7 @@ function viewer() {
     }
 
     function snapToGrid(ship) {
-        const gridPos = gameGrid.getBoundingClientRect()
+        const gridPos = playerGrid.getBoundingClientRect()
         const shipPos = ship.getBoundingClientRect()
         
         const gridLeft = parseFloat(gridPos.left)
@@ -136,7 +138,7 @@ function viewer() {
     }
     
     function fitShipIntoGrid(ship) {
-        const gridPos = gameGrid.getBoundingClientRect()
+        const gridPos = playerGrid.getBoundingClientRect()
         const shipPos = ship.getBoundingClientRect()
     
         let shipX, shipY
@@ -180,7 +182,6 @@ function viewer() {
         Array.from(remainingShips).forEach(ship => {
             if(!ship.onmousedown) return
             rotateShip(ship)
-            fitShipIntoGrid(ship)
         })    
     }
     
@@ -210,10 +211,15 @@ function viewer() {
     }
 
     function positionShip(ship, xPos, yPos) {
-        gameGrid.appendChild(ship)
+        playerGrid.appendChild(ship)
         ship.style.position = 'absolute'
         ship.style.left = xPos + 'px'
         ship.style.top = yPos + 'px'
+    }
+
+    function toggleSetupScreen() {
+        setupScreen.style.display = 'none'
+        gameScreen.appendChild(playerGrid)
     }
 
     return {
@@ -226,6 +232,7 @@ function viewer() {
         getGridCellPosition,
         positionShip,
         snapToGrid,
+        toggleSetupScreen,
     }
 }
 

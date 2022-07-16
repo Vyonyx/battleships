@@ -9,12 +9,12 @@ const aiModelBoard = gameBoard(modelGridMatrixSize)
 const gameDisplay = viewer()
 
 // Create draggable ships.
-// const ship1 = gameDisplay.createShip('carrier')
-// const ship2 = gameDisplay.createShip('battleship')
-// const ship3 = gameDisplay.createShip('cruiser')
-// const ship4 = gameDisplay.createShip('destroyer')
+const ship1 = gameDisplay.createShip('carrier')
+const ship2 = gameDisplay.createShip('battleship')
+const ship3 = gameDisplay.createShip('cruiser')
+const ship4 = gameDisplay.createShip('destroyer')
 
-createShipsFromInitialisation(aiModelBoard)
+// createShipsFromInitialisation(aiModelBoard)
 
 function createShipsFromInitialisation(board) {
     board.randomBoardInitialisation()
@@ -29,10 +29,10 @@ function createShipsFromInitialisation(board) {
 }
 
 gameDisplay.rotateBtn.addEventListener('click', gameDisplay.rotateShipsContainer)
-gameDisplay.startBtn.addEventListener('click', gameDisplay.startGame)
+gameDisplay.startBtn.addEventListener('click', startGame)
 
 function startGame() {
-    assignShipsToGameboard()
+    gameDisplay.toggleSetupScreen()
 }
 
 function assignShipsToGameboard() {
