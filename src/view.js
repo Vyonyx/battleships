@@ -88,6 +88,7 @@ function viewer() {
             ship.onmouseup = function(e) {
                 document.removeEventListener('mousemove', onMouseMove)
                 ship.onmouseup = null
+                document.body.appendChild(ship)
                 snapToGrid(ship)
                 ship.style.zIndex = 1
                 ship.onmousedown = null
@@ -123,12 +124,12 @@ function viewer() {
         const gridPos = gameGrid.getBoundingClientRect()
         const shipPos = ship.getBoundingClientRect()
         
-        const leftOffset = parseFloat(gridPos.left)
-        const topOffset = parseFloat(gridPos.top)
+        const gridLeft = parseFloat(gridPos.left)
+        const gridTop = parseFloat(gridPos.top)
         const gridIncrements = parseInt(cellSize)
-    
-        let shipX = (Math.floor((parseInt(shipPos.x) - leftOffset) / gridIncrements) * gridIncrements) + leftOffset
-        let shipY = (Math.floor((parseInt(shipPos.y) - topOffset) / gridIncrements) * gridIncrements) + topOffset
+        
+        let shipX = Math.floor((parseFloat(shipPos.x) - gridLeft) / CELL_HEIGHT) * CELL_HEIGHT
+        let shipY = Math.floor((parseFloat(shipPos.y) - gridTop) / CELL_HEIGHT) * CELL_HEIGHT
 
         positionShip(ship, shipX, shipY)
         fitShipIntoGrid(ship)
@@ -143,29 +144,29 @@ function viewer() {
         if (parseFloat(shipPos.left) < parseFloat(gridPos.left) ||
             parseFloat(shipPos.right) < parseFloat(gridPos.left)) {
                 console.log('too far left')
-            shipX = parseFloat(gridPos.left)
+                shipX = parseFloat(gridPos.left)
+                shipX = 0
         }
     
         else if (parseFloat(shipPos.left) > parseFloat(gridPos.right) ||
             parseFloat(shipPos.right) > parseFloat(gridPos.right)) {
                 console.log('too far right')
-            shipX = parseFloat(gridPos.right) - parseFloat(shipPos.width)
+                shipX = 0 + parseFloat(gridPos.width) - parseFloat(shipPos.width)
         }
     
         if (parseFloat(shipPos.top) < parseFloat(gridPos.top) ||
             parseFloat(shipPos.bottom) < parseFloat(gridPos.top)) {
                 console.log('too far top')
-            shipY = parseFloat(gridPos.top)
+                shipY = 0
         }
     
         else if (parseFloat(shipPos.top) > parseFloat(gridPos.bottom) ||
             parseFloat(shipPos.bottom) > parseFloat(gridPos.bottom)) {
                 console.log('too far bottom')
-            shipY = parseFloat(gridPos.bottom) - parseFloat(shipPos.height)
+                shipY = 0 + parseFloat(gridPos.height) - parseFloat(shipPos.height)
         }
     
-        ship.style.left = shipX + 'px'
-        ship.style.top = shipY + 'px'
+        positionShip(ship, shipX, shipY)
     }
     
     function rotateShipsContainer() {
@@ -203,13 +204,14 @@ function viewer() {
 
     function getGridCellPosition(x, y) {
         const cell = document.querySelector(`[data-coord="${x} ${y}"]`)
-        const coords = cell.getBoundingClientRect()
-        const xPos = coords.left
-        const yPos = coords.top
+        const xPos = cell.offsetLeft
+        const yPos = cell.offsetTop
         return {xPos, yPos}
     }
 
     function positionShip(ship, xPos, yPos) {
+        gameGrid.appendChild(ship)
+        ship.style.position = 'absolute'
         ship.style.left = xPos + 'px'
         ship.style.top = yPos + 'px'
     }

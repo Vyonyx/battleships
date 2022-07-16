@@ -24,7 +24,7 @@ function createShipsFromInitialisation(board) {
         const newShip = gameDisplay.createShip(item.ship.getType)
         if (item.direction == 'vertical') gameDisplay.rotateShip(newShip)
         const {xPos, yPos} = gameDisplay.getGridCellPosition(item.xPos, item.yPos)
-        console.log(xPos, yPos)
+        gameDisplay.positionShip(newShip, xPos, yPos)
     })
 }
 
