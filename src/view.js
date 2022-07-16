@@ -13,13 +13,15 @@ function viewer() {
     
     // ---------- Diagrams showing how to position ships on player board. ---------- \\
     const moveDiagram = new Image(90)
-    moveDiagram.src = require('./assets/move-diagram.svg')
     const rotateDiagram = new Image(140)
+    moveDiagram.src = require('./assets/move-diagram.svg')
     rotateDiagram.src = require('./assets/rotate-diagram.svg')
     document.querySelector('.instruction-move').appendChild(moveDiagram)
     document.querySelector('.instruction-rotate').appendChild(rotateDiagram)
     
+    // ---------- DOM grids. ---------- \\
     const playerGrid = document.querySelector('.grid')
+    const aiGrid = document.querySelector('.ai-grid')
     const shipStartingContainer = document.querySelector('.ship-container')
     
     // ---------- Parameters for the displayed grid. ---------- \\
@@ -186,11 +188,11 @@ function viewer() {
     }
     
     function rotateShip(ship) {
-        const data = ship.getBoundingClientRect()
-        let shipHeight = data.width + 'px'
-        let shipWidth = data.height + 'px'
-        ship.style.height = shipHeight
-        ship.style.width = shipWidth
+        let newHeight = ship.width
+        let newWidth = ship.height
+        ship.height = newHeight
+        ship.width = newWidth
+        
         const type = ship.getAttribute('data-ship-type')
         const currentOrientation = ship.getAttribute('data-ship-orientation')
         const newOrientation = currentOrientation == 'horizontal' ? 'vertical' : 'horizontal'
@@ -210,19 +212,24 @@ function viewer() {
         return {xPos, yPos}
     }
 
-    function positionShip(ship, xPos, yPos) {
-        playerGrid.appendChild(ship)
+    function positionShip(ship, xPos, yPos, grid = playerGrid) {
+        grid.appendChild(ship)
         ship.style.position = 'absolute'
         ship.style.left = xPos + 'px'
         ship.style.top = yPos + 'px'
     }
 
     function toggleSetupScreen() {
-        setupScreen.style.display = 'none'
-        gameScreen.appendChild(playerGrid)
+        setupScreen.classList.toggle('hide')
+        gameScreen.classList.toggle('hide')
+
+        gameScreen.prepend(playerGrid)
+        initaliseBoard(aiGrid)
     }
 
     return {
+        playerGrid,
+        aiGrid,
         rotateBtn,
         startBtn,
         createShip,

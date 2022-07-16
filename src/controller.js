@@ -3,28 +3,30 @@ const { viewer } = require('./view')
 require('./style.scss')
 
 const modelGridMatrixSize = 8
-const board = gameBoard(modelGridMatrixSize)
+const playerModelBoard = gameBoard(modelGridMatrixSize)
 const aiModelBoard = gameBoard(modelGridMatrixSize)
 
 const gameDisplay = viewer()
 
 // Create draggable ships.
-const ship1 = gameDisplay.createShip('carrier')
-const ship2 = gameDisplay.createShip('battleship')
-const ship3 = gameDisplay.createShip('cruiser')
-const ship4 = gameDisplay.createShip('destroyer')
+// const ship1 = gameDisplay.createShip('carrier')
+// const ship2 = gameDisplay.createShip('battleship')
+// const ship3 = gameDisplay.createShip('cruiser')
+// const ship4 = gameDisplay.createShip('destroyer')
 
-// createShipsFromInitialisation(aiModelBoard)
+createShipsFromInitialisation(playerModelBoard)
 
 function createShipsFromInitialisation(board) {
     board.randomBoardInitialisation()
     const data = board.shipsData
-
+    console.log(data)
     data.forEach(item => {
         const newShip = gameDisplay.createShip(item.ship.getType)
+        newShip.onmousedown = null
         if (item.direction == 'vertical') gameDisplay.rotateShip(newShip)
         const {xPos, yPos} = gameDisplay.getGridCellPosition(item.xPos, item.yPos)
-        gameDisplay.positionShip(newShip, xPos, yPos)
+        if (board == playerModelBoard) { gameDisplay.positionShip(newShip, xPos, yPos) }
+        if (board == aiModelBoard) { gameDisplay.positionShip(newShip, xPos, yPos, gameDisplay.aiGrid) }
     })
 }
 
@@ -33,6 +35,7 @@ gameDisplay.startBtn.addEventListener('click', startGame)
 
 function startGame() {
     gameDisplay.toggleSetupScreen()
+    createShipsFromInitialisation(aiModelBoard)
 }
 
 function assignShipsToGameboard() {
@@ -54,7 +57,7 @@ function assignShipsToGameboard() {
         })
 
         const newShip = ship(currentShip.getAttribute('data-ship-type'))
-        board.assignShipPosition(newShip, gridXPos, gridYPos, shipOrientation)
+        playerModelBoard.assignShipPosition(newShip, gridXPos, gridYPos, shipOrientation)
     })
-    console.table(board.grid)
+    console.table(playerModelBoard.grid)
 }
