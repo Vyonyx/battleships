@@ -33,6 +33,8 @@ function viewer() {
     
     // ---------- Game setup. ---------- \\
     initaliseBoard(playerGrid)
+
+    let playerAttack
     
     function initaliseBoard(board) {
         const positions = Array.from((Array(matrixSize)), (col, yIndex) => {
@@ -227,9 +229,29 @@ function viewer() {
         initaliseBoard(aiGrid)
     }
 
+    function hideShips() {
+        [...aiGrid.children].forEach(child => {
+            if (child.tagName == 'IMG') child.classList.toggle('hide')
+        })
+    }
+
+    function initialiseCells() {
+        [...aiGrid.children].forEach(row => {
+            [...row.children].forEach(cell => {
+                if (cell.classList.contains('gridCell')) {
+                    cell.addEventListener('click', (e) => {
+                        playerAttack = e.target.getAttribute('data-coord')
+                        console.log(playerAttack)
+                    }, { once: true })
+                }
+            })
+        })
+    }
+
     return {
         playerGrid,
         aiGrid,
+        playerAttack,
         rotateBtn,
         startBtn,
         createShip,
@@ -240,6 +262,8 @@ function viewer() {
         positionShip,
         snapToGrid,
         toggleSetupScreen,
+        hideShips,
+        initialiseCells,
     }
 }
 

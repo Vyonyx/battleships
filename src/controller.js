@@ -16,6 +16,52 @@ const gameDisplay = viewer()
 
 createShipsFromInitialisation(playerModelBoard)
 
+gameDisplay.rotateBtn.addEventListener('click', gameDisplay.rotateShipsContainer)
+gameDisplay.startBtn.addEventListener('click', startGame)
+
+function startGame() {
+    gameDisplay.toggleSetupScreen()
+    createShipsFromInitialisation(aiModelBoard)
+    
+    const currentPlayer = player(playerModelBoard, aiModelBoard)
+    const aiPlayer = player(aiModelBoard, playerModelBoard)
+    console.log(currentPlayer.myBoard.grid)
+    console.log(aiPlayer.myBoard.grid)
+
+    gameDisplay.aiGrid.addEventListener('click', (e) => {
+        e.preventDefault()
+        if (!e.target.classList.contains('gridCell')) return
+        const attr = e.target.getAttribute('data-coord')
+        let [xPos, yPos] = attr.split(' ').map(num => parseInt(num))
+
+        // Declare player attack.
+        const playerAttack = currentPlayer.attack({ xPos, yPos })
+        // console.log(playerAttack)
+        // console.log(aiPlayer.myBoard.attackedPositions)
+
+        // Random AI attack.
+        const aiAttack = aiPlayer.randomAttack()
+
+        // Display cell color.
+        if (playerAttack.result == 'hit') {
+            e.target.style.background = 'red'
+        } else if (playerAttack.result == 'miss') {
+            e.target.style.background = 'black'
+        }
+
+        const aiCellChoice = document.querySelector(`[data-coord="${aiAttack.xPos} ${aiAttack.yPos}"]`)
+        if (aiAttack.result == 'hit') {
+            aiCellChoice.style.background = 'red'
+        } else if (aiAttack.result == 'miss') {
+            aiCellChoice.style.background = 'black'
+        }
+        // Check if game over/all ships sunken and remove aiGrid event listener?
+        if (aiPlayer.myBoard.shipsSunken()) console.log('You win.')
+        else if (currentPlayer.myBoard.shipsSunken()) console.log('You lose.')
+
+    })
+}
+
 function createShipsFromInitialisation(board) {
     board.randomBoardInitialisation()
     const data = board.shipsData
@@ -26,38 +72,10 @@ function createShipsFromInitialisation(board) {
         if (item.direction == 'vertical') gameDisplay.rotateShip(newShip)
         const {xPos, yPos} = gameDisplay.getGridCellPosition(item.xPos, item.yPos)
         if (board == playerModelBoard) { gameDisplay.positionShip(newShip, xPos, yPos) }
-        if (board == aiModelBoard) { gameDisplay.positionShip(newShip, xPos, yPos, gameDisplay.aiGrid) }
+
+        if (board == aiModelBoard) {
+            gameDisplay.positionShip(newShip, xPos, yPos, gameDisplay.aiGrid)
+        }
     })
-}
-
-gameDisplay.rotateBtn.addEventListener('click', gameDisplay.rotateShipsContainer)
-gameDisplay.startBtn.addEventListener('click', startGame)
-
-function startGame() {
-    gameDisplay.toggleSetupScreen()
-    createShipsFromInitialisation(aiModelBoard)
-}
-
-function assignShipsToGameboard() {
-    const allShips = document.querySelectorAll('.ship')
-    allShips.forEach(currentShip => {
-        const shipCoords = currentShip.getBoundingClientRect()
-        const shipOrientation = currentShip.getAttribute('data-ship-orientation')
-        let gridXPos, gridYPos
-
-        Array.from(gameGrid.children).forEach(row => {
-            [...row.children].forEach(cell => {
-                const cellCoords = cell.getBoundingClientRect()
-                if(shipCoords.x == cellCoords.x && shipCoords.y == cellCoords.y) {
-                    const cellData = cell.getAttribute('data-coord').split(' ')
-                    gridXPos = parseInt(cellData[0])
-                    gridYPos = parseInt(cellData[1])
-                }
-            })
-        })
-
-        const newShip = ship(currentShip.getAttribute('data-ship-type'))
-        playerModelBoard.assignShipPosition(newShip, gridXPos, gridYPos, shipOrientation)
-    })
-    console.table(playerModelBoard.grid)
+    gameDisplay.hideShips()
 }

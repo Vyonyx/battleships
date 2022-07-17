@@ -73,7 +73,7 @@ function gameBoard(gridCells = 9) {
     }
 
     function displayHitShipOnGrid(x, y) {
-        if (grid[y][x] == ' ') { grid[y][x] = 'miss'; return }
+        if (grid[y][x] == ' ') { grid[y][x] = 'miss'; return {result: 'miss', xPos: x, yPos: y} }
 
         let hitIndex = null
         const hitShip = shipsData.find(({ship}) => 
@@ -81,14 +81,18 @@ function gameBoard(gridCells = 9) {
                 if (xPos == x && yPos == y) { hitIndex = index; return true }
             })
         ).ship.hit(hitIndex)
+        grid[y][x] = 'hit'
+        return {result: 'hit', xPos: x, yPos: y}
     }
 
     function attack(x, y) {
         const wasPrevAttack = attackedPositions.some( ({xPos, yPos}) => xPos == x && yPos == y )
-        if (wasPrevAttack) throw Error('Was a previous attack.')
-
-        attackedPositions.push({xPos: x, yPos: y})
-        displayHitShipOnGrid(x, y)
+        if (wasPrevAttack) {
+            throw Error('Was a previous attack.')
+        } else if (!wasPrevAttack) {
+            attackedPositions.push({xPos: x, yPos: y})
+            return displayHitShipOnGrid(x, y)
+        }
     }
 
     function shipsSunken() {
@@ -96,11 +100,13 @@ function gameBoard(gridCells = 9) {
     }
 
     function availableMoves() {
+        const legalTiles = [' ', 'carrier', 'battleship', 'cruiser', 'destroyer']
+        // const legalTiles = [' ']
         const moves = []
         grid.forEach((row, yIndex) => {
             row.forEach((element, xIndex) => {
-                if (element == ' ') {
-                    const coord = {x:xIndex, y: yIndex}
+                if (legalTiles.includes(element)) {
+                    const coord = {xPos: xIndex, yPos: yIndex}
                     moves.push(coord)
                 }
             })
@@ -168,25 +174,15 @@ function player(pB, eB) {
     const enemy = eB
 
     function attack(coords) {
-        let {x, y} = coords
-        enemy.attack(x, y)
+        let {xPos, yPos} = coords
+        return enemy.attack(xPos, yPos)
     }
 
-    function randomAttack(inputCoords = null) {
-        let attackedPositions = enemy.attackedPositions
-        if (attackedPositions.length >= 99) return
-        
-        if (inputCoords != null) {
-            let {x, y} = inputCoords
-            enemy.attack(x, y)
-            return
-        } else {
-            const movesList = enemy.availableMoves()
-            const randIndex = Math.floor(Math.random() * movesList.length)
-            const randMove = movesList[randIndex]
-            attack(randMove)
-            return
-        }
+    function randomAttack() {
+        const movesList = enemy.availableMoves()
+        const randIndex = Math.floor(Math.random() * (movesList.length))
+        const randMove = movesList[randIndex]
+        return attack(randMove)
     }
 
     return {
