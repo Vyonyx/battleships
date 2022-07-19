@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
 @mixin nextButton() {
     position: fixed;
     right: 50px;
@@ -6,7 +9,8 @@
     height: 80px;
     padding: 1em;
 
-    font-size: 2em;
+    font-size: 2rem;
+    font-family: 'Syne Mono', monospace;
     border: 3px solid #666;
     color: #666;
     background: white;
@@ -21,10 +25,19 @@
     }
 }
 
+@mixin absoluteCenter {
+    position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%)    
+}
+
 * {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
+    font-size: 62.5%;
+    font-family: 'VT323', monospace;
 }
 
 // Positioning.
@@ -56,6 +69,7 @@
             display: grid;
             grid-template-columns: repeat(2, 350px);
             gap: 20px;
+            font-size: 6rem;
 
             div {
                 display: flex;
@@ -80,6 +94,27 @@
         }
 }
 
+.game-screen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+    .ship {
+        z-index: -1;
+    }
+
+    .hit-cell {
+        background: rgba($color: #ff0000, $alpha: 0.75);
+    }
+
+    .miss-cell {
+        background: rgba($color: #161616, $alpha: 0.75);
+    }
+}
+
+// Grid cell styling.
 .grid {
     position: relative;
     border: 5px solid black;
@@ -98,14 +133,40 @@
     }
 }
 
-.game-screen {
+// Intro and Exit screen stylings.
+.end-game {
+    display: flex;
+    position: relative;
     width: 100vw;
     height: 100vh;
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
+
+    .central-img {
+        @include absoluteCenter();
+        z-index: 0;
+    }
+
+    .text {
+        @include absoluteCenter();
+        font-family: 'VT323', monospace;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 1;
+        font-size: 10rem;
+        
+        h2 {
+            font-size: 3rem;
+        }
+
+    }
+
+    button {
+        @include nextButton();
+    }
 }
 
+// Hide html elements.
 .hide {
     display: none;
 }

@@ -23,6 +23,9 @@ function viewer() {
     const playerGrid = document.querySelector('.grid')
     const aiGrid = document.querySelector('.ai-grid')
     const shipStartingContainer = document.querySelector('.ship-container')
+
+    const endScreen = document.querySelector('.end-game')
+    const resultText = document.querySelector('.game-result')
     
     // ---------- Parameters for the displayed grid. ---------- \\
     const matrixSize = 8;
@@ -248,6 +251,13 @@ function viewer() {
         })
     }
 
+    function toggleGameEndScreen(result='win') {
+        gameScreen.classList.toggle('hide')
+        endScreen.classList.toggle('hide')
+        resultText.innerText = result == 'win' ? 'You win...' : 'You lose...'
+
+    }
+
     return {
         playerGrid,
         aiGrid,
@@ -264,6 +274,7 @@ function viewer() {
         toggleSetupScreen,
         hideShips,
         initialiseCells,
+        toggleGameEndScreen,
     }
 }
 
