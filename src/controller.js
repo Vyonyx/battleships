@@ -16,7 +16,7 @@ const gameDisplay = viewer()
 
 createShipsFromInitialisation(playerModelBoard)
 
-gameDisplay.rotateBtn.addEventListener('click', gameDisplay.rotateShipsContainer)
+// gameDisplay.rotateBtn.addEventListener('click', gameDisplay.rotateShipsContainer)
 gameDisplay.startBtn.addEventListener('click', startGame)
 
 function startGame() {
@@ -36,29 +36,30 @@ function startGame() {
 
         // Declare player attack.
         const playerAttack = currentPlayer.attack({ xPos, yPos })
-        // console.log(playerAttack)
-        // console.log(aiPlayer.myBoard.attackedPositions)
 
         // Random AI attack.
         const aiAttack = aiPlayer.randomAttack()
 
         // Display cell color.
         if (playerAttack.result == 'hit') {
-            e.target.style.background = 'red'
+            e.target.classList.add('hit-cell')
         } else if (playerAttack.result == 'miss') {
-            e.target.style.background = 'black'
+            e.target.classList.add('miss-cell')
         }
 
         const aiCellChoice = document.querySelector(`[data-coord="${aiAttack.xPos} ${aiAttack.yPos}"]`)
         if (aiAttack.result == 'hit') {
-            aiCellChoice.style.background = 'red'
+            aiCellChoice.classList.add('hit-cell')
         } else if (aiAttack.result == 'miss') {
-            aiCellChoice.style.background = 'black'
+            aiCellChoice.classList.add('miss-cell')
         }
         // Check if game over/all ships sunken and remove aiGrid event listener?
-        if (aiPlayer.myBoard.shipsSunken()) console.log('You win.')
-        else if (currentPlayer.myBoard.shipsSunken()) console.log('You lose.')
-
+        if (aiPlayer.myBoard.shipsSunken()) {
+            gameDisplay.toggleGameEndScreen('win')
+        }
+        else if (currentPlayer.myBoard.shipsSunken()) {
+            gameDisplay.toggleGameEndScreen('lose')
+        }
     })
 }
 
